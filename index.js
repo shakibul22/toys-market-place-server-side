@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 var cors = require("cors");
 const port = process.env.PORT || 5000;
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config()
 
 
@@ -27,7 +27,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
     const toysCollection = client.db('toys-market-place').collection('toys')
 
     app.post('/postToy', async (req, res) => {
@@ -57,7 +57,18 @@ async function run() {
     });
 
 
-
+    app.get("/getToysByText/:text", async (req, res) => {
+      const searchText = req.params.text;
+      const result = await toysCollection
+        .find({
+          $or: [
+           
+            { subCategory: { $regex: searchText, $options: "i" } },
+          ],
+        })
+        .toArray();
+      res.send(result);
+    });
    
 
 
@@ -69,25 +80,30 @@ async function run() {
 
  ;
 
+ app.delete('/myToys/:id', async (req, res) => {
+  const id = req.params.id;
+  console.log('plz delete', id);
+  const query = { _id: new ObjectId(id) };
+  const result = await toysCollection.deleteOne(query);
+  res.send(result)
 
+})
   
 
     //Update
 
-    // app.put("/updateToy/:id", async (req, res) => {
-    //   const id = req.params.id;
-    //   const body = req.body;
-    //   console.log(body);
-    //   const filter = { _id: new ObjectId(id) };
-    //   const updateDoc = {
-    //     $set: {
-
-    //       category: body.category,
-    //     },
-    //   };
-    //   const result = await toysCollection.updateOne(filter, updateDoc);
-    //   res.send(result);
-    // });
+    app.put("/updateToy/:id", async (req, res) => {
+      const id = req.params.id;
+      const body = req.body;
+      const filter = { _id: new ObjectId(id) };
+      const updateDoc = {
+        $set: {
+          subCategory: body.subCategory,
+        },
+      };
+      const result = await toysCollection.updateOne(filter, updateDoc);
+      res.send(result);
+    });
     // Send a ping to confirm a successful connection
     // await client.db("admin").command({ ping: 1 });
 
