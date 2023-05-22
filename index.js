@@ -30,23 +30,68 @@ async function run() {
     await client.connect();
     const toysCollection = client.db('toys-market-place').collection('toys')
 
-    app.get('/toys', async (req, res) => {
+    app.post('/postToy', async (req, res) => {
+      const body = req.body;
+      const result = await toysCollection.insertOne(body);
+      res.send(result)
+      console.log(body);
+    })
+
+    // subCategory
+    app.get('/allToys/:text', async (req, res) => {
+      const result = await toysCollection.find({
+        subCategory
+          : req.params.text
+      }).toArray();
+      return res.send(result)
+    })
+
+    app.get("/myToys/:email", async (req, res) => {
+      console.log(req.params.email);
+      const toys = await toysCollection
+        .find({
+          sellerEmail : req.params.email,
+        })
+        .toArray();
+      res.send(toys);
+    });
+
+
+
+   
+
+
+    app.get('/allToys', async (req, res) => {
       const cursor = toysCollection.find();
       const result = await cursor.toArray();
       res.send(result)
     })
 
-
-    app.post('/toys', async (req, res) => {
-      const newToys = req.body;
-      console.log(newToys);
-      const result = await toysCollection.insertOne(newToys);
-      res.send(result)
+ ;
 
 
-    })
+  
+
+    //Update
+
+    // app.put("/updateToy/:id", async (req, res) => {
+    //   const id = req.params.id;
+    //   const body = req.body;
+    //   console.log(body);
+    //   const filter = { _id: new ObjectId(id) };
+    //   const updateDoc = {
+    //     $set: {
+
+    //       category: body.category,
+    //     },
+    //   };
+    //   const result = await toysCollection.updateOne(filter, updateDoc);
+    //   res.send(result);
+    // });
     // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
+    // await client.db("admin").command({ ping: 1 });
+
+
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
     // Ensures that the client will close when you finish/error
