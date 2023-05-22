@@ -63,7 +63,8 @@ async function run() {
         .find({
           $or: [
            
-            { subCategory: { $regex: searchText, $options: "i" } },
+            { subCategory: { $regex: searchText, $options: "i" }  },
+            {name: { $regex: searchText, $options: "i" }}
           ],
         })
         .toArray();
@@ -96,12 +97,16 @@ async function run() {
       const id = req.params.id;
       const body = req.body;
       const filter = { _id: new ObjectId(id) };
-      const updateDoc = {
+      const updateToy = {
         $set: {
+          name:body.name,
+          price:body.price,
+          quantity:body.quantity,
+          sellerName:body.sellerName,
           subCategory: body.subCategory,
         },
       };
-      const result = await toysCollection.updateOne(filter, updateDoc);
+      const result = await toysCollection.updateOne(filter, updateToy);
       res.send(result);
     });
     // Send a ping to confirm a successful connection
