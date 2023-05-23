@@ -93,6 +93,16 @@ async function run() {
       res.send(result)
     })
 
+
+    app.get(`/details/:id`, async (req, res) => {
+      console.log('id is ',req.params.id);
+
+      // return res.send("hello")
+      const cursor = await toysCollection.findOne({ _id: new ObjectId(req.params.id) });
+      // const result = await cursor.toArray();
+      res.send(cursor)
+    })
+
  
 
  app.delete('/myToys/:id', async (req, res) => {
