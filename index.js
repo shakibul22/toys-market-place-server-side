@@ -79,7 +79,21 @@ async function run() {
       res.send(result)
     })
 
- ;
+    app.get('/ascending', async (req, res) => {
+      const cursor = toysCollection.find({}).sort({price: 1 }).collation({ locale: "en_US", numericOrdering: true })
+      const result = await cursor.toArray();
+      res.send(result)
+
+    })
+
+
+    app.get(`/descending`, async (req, res) => {
+      const cursor = toysCollection.find({}).sort({price: -1 }).collation({ locale: "en_US", numericOrdering: true })
+      const result = await cursor.toArray();
+      res.send(result)
+    })
+
+ 
 
  app.delete('/myToys/:id', async (req, res) => {
   const id = req.params.id;
