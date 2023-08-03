@@ -94,16 +94,22 @@ async function run() {
     })
 
 
-    app.get(`/details/:id`, async (req, res) => {
-      console.log('id is ',req.params.id);
 
-      // return res.send("hello")
-      const cursor = await toysCollection.findOne({ _id: new ObjectId(req.params.id) });
-      // const result = await cursor.toArray();
-      res.send(cursor)
-    })
+    app.post('/toyDetails/:id', async (req, res) => {
+      const toy = await toysCollection.findOne({ _id: new ObjectId(req.params.id) });
 
- 
+      res.send(toy);
+  });
+
+  app.get('/toyDetails/:id', async (req, res) => {
+      const toy = await toysCollection.findOne({ _id: new ObjectId(req.params.id) });
+
+     
+      res.send(toy);
+  });
+  
+  
+
 
  app.delete('/myToys/:id', async (req, res) => {
   const id = req.params.id;
